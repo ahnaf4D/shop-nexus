@@ -16,7 +16,9 @@
   "description": "Nexus Shop Server",
   "dependencies": {
     "express": "^4.19.2",
-    "http-errors": "^2.0.0"
+    "express-rate-limit": "^7.3.1",
+    "http-errors": "^2.0.0",
+    "xss": "^1.0.15"
   },
   "devDependencies": {
     "morgan": "^1.10.0"

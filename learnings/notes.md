@@ -252,6 +252,109 @@ app.listen(PORT, () => {
 
 By using `http-errors`, you can create and manage HTTP errors efficiently in your Express application, ensuring clear and consistent error handling across your routes.
 
+### 10. Securing Your API with `xss` and `express-rate-limit`
+
+To secure your API against XSS attacks and rate-limit excessive requests, you can use the `xss` package and the `express-rate-limit` middleware. Below is a professional and well-organized guide to implementing these security measures in your Express application.
+
+#### 1. Install Required Packages
+
+First, install the necessary packages:
+
+```bash
+npm install xss express-rate-limit
+```
+
+#### 2. Implement XSS Protection Middleware
+
+Use the `xss` package to sanitize user inputs in your API endpoints. This middleware ensures that any string inputs in `req.body` and `req.query` are cleaned to prevent XSS attacks.
+
+```javascript
+const xss = require('xss');
+
+app.use((req, res, next) => {
+  req.body = JSON.parse(
+    JSON.stringify(req.body, (key, value) =>
+      typeof value === 'string' ? xss(value) : value
+    )
+  );
+  req.query = JSON.parse(
+    JSON.stringify(req.query, (key, value) =>
+      typeof value === 'string' ? xss(value) : value
+    )
+  );
+  next();
+});
+```
+
+#### 3. Implement Rate Limiting
+
+Use the `express-rate-limit` middleware to limit the number of requests a client can make to your API within a specified time window. This helps to prevent abuse and denial-of-service attacks.
+
+```javascript
+const rateLimit = require('express-rate-limit');
+
+const rateLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 5, // Limit each IP to 5 requests per windowMs
+  message: 'Too many requests from this IP, please try again later',
+});
+
+app.use(rateLimiter);
+```
+
+#### 4. Full Example
+
+Below is a complete example of an Express application with both XSS protection and rate limiting implemented:
+
+```javascript
+const express = require('express');
+const xss = require('xss');
+const rateLimit = require('express-rate-limit');
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// XSS protection middleware
+app.use((req, res, next) => {
+  req.body = JSON.parse(
+    JSON.stringify(req.body, (key, value) =>
+      typeof value === 'string' ? xss(value) : value
+    )
+  );
+  req.query = JSON.parse(
+    JSON.stringify(req.query, (key, value) =>
+      typeof value === 'string' ? xss(value) : value
+    )
+  );
+  next();
+});
+
+// Rate limiting middleware
+const rateLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 5, // Limit each IP to 5 requests per windowMs
+  message: 'Too many requests from this IP, please try again later',
+});
+
+app.use(rateLimiter);
+
+// Example route
+app.get('/', (req, res) => {
+  res.send('Hello, world!');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+```
+
+#### Official Documentation
+
+- [xss package on npm](https://www.npmjs.com/package/xss)
+- [express-rate-limit package on npm](https://www.npmjs.com/package/express-rate-limit)
+
 ## Add Some API Testing Endpoints
 
 To ensure your API is functioning correctly, add the following testing endpoints to your Express server:

@@ -4,8 +4,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon index.js"
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js"
   },
   "keywords": [
     "ecommerce",
@@ -16,5 +16,8 @@
   "description": "Nexus Shop Server",
   "dependencies": {
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0"
   }
 }

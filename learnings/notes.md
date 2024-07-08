@@ -35,6 +35,34 @@
 
 ---
 
+## Add Some API Testing Endpoints
+
+To ensure your API is functioning correctly, add the following testing endpoints to your Express server:
+
+```javascript
+app.get('/test', (req, res) => {
+  res.status(200).send({ message: 'GET: API working fine' });
+});
+
+app.post('/test', (req, res) => {
+  res.status(200).send({ message: 'POST: API working fine' });
+});
+
+app.put('/test', (req, res) => {
+  res.status(200).send({ message: 'PUT: API working fine' });
+});
+
+app.delete('/test', (req, res) => {
+  res.status(200).send({ message: 'DELETE: API working fine' });
+});
+```
+
+You can verify these endpoints using Postman. Below is a demo of the GET request:
+
+![Postman Demo](https://i.ibb.co/z8XZtyn/Screenshot-1.png)
+
+---
+
 ## Additional Information
 
 ### Database Integration
@@ -82,7 +110,3 @@
 
 - Learn how to deploy your application to cloud services like Heroku, AWS, or DigitalOcean.
 - Understand the basics of CI/CD (Continuous Integration and Continuous Deployment).
-
----
-
-By covering these additional topics, you'll be better prepared to handle the responsibilities of a junior MERN stack developer and build more robust and scalable applications.

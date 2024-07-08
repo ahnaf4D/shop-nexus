@@ -521,6 +521,12 @@ Certainly! Here's a structured and formatted document outlining the setup for co
 
 This structured document provides a clear outline for connecting to MongoDB using Mongoose, organizing configuration files (`db.js`, `secret.js`), defining environment variables in `.env`, and structuring models in a Node.js application. Adjust paths and configurations based on specific project requirements.
 
+### 14. Explore Mongoose Schema and create models
+
+- Learn how to create a Model and implement a schema.
+- Explore [Schemas](https://mongoosejs.com/docs/guide.html), [Schema Types](https://mongoosejs.com/docs/schematypes.html).
+- Task for learning Mongoose
+
 ## Add Some API Testing Endpoints
 
 To ensure your API is functioning correctly, add the following testing endpoints to your Express server:

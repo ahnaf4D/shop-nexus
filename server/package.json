@@ -15,7 +15,8 @@
   "license": "ISC",
   "description": "Nexus Shop Server",
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "http-errors": "^2.0.0"
   },
   "devDependencies": {
     "morgan": "^1.10.0"

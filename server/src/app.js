@@ -1,5 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
+import createHttpError from 'http-errors';
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -37,14 +38,13 @@ app.delete(`/test`, (req, res) => {
 });
 // client error handling middlewares
 app.use((req, res, next) => {
-  res.status(404).json({ massage: 'route not found' });
-  next();
+  next(createHttpError(404, 'Route not found'));
 });
-// http/server error handling middleware
+// http/server error handling middleware -> all the errors
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  res.status(err.status || 500).json({ success: false, message: err.message });
 });
+
 app.listen(port, () => {
   console.log(`server is running at http://localhost:${port}`);
 });

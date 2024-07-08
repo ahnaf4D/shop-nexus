@@ -8,7 +8,7 @@ const raterLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
   limit: 5, // Limit each IP to 100 requests per `window` (here, per 1 minutes).
   massage: 'Too many requests from you ip please try again later',
-}); // rate limiter middlware
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
@@ -26,19 +26,7 @@ app.use((req, res, next) => {
 }); // xss package middleware
 app.use(morgan('dev'));
 app.use(raterLimiter);
-
-// import products from './products.json' assert { type: 'json' };
-// custom middlewares
-// const isLoggedIn = (req, res, next) => {
-//   const login = true;
-//   if (login) {
-//     req.body.id = 101;
-//     next();
-//   } else {
-//     return res.status(401).json({ massage: 'login first' });
-//   }
-// };
-const port = process.env.PORT || 3001;
+// const port = process.env.PORT || 3001;
 app.get(`/`, (req, res) => {
   res.status(200).send({ massage: 'Welcome to the Nexus Server' });
 });
@@ -67,7 +55,4 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ success: false, message: err.message });
 });
 
-app.listen(port, () => {
-  console.log(`server is running at http://localhost:${port}`);
-});
 export default app;

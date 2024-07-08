@@ -1,0 +1,132 @@
+[
+  {
+    "id": "1",
+    "name": "Wireless Headphones",
+    "description": "High-quality wireless headphones with noise-cancellation and long battery life.",
+    "price": 99.99,
+    "category": "Electronics",
+    "stock": 50,
+    "rating": 4.5,
+    "images": [
+      "https://example.com/images/headphones1.jpg",
+      "https://example.com/images/headphones2.jpg"
+    ]
+  },
+  {
+    "id": "2",
+    "name": "Smartwatch",
+    "description": "Stylish smartwatch with fitness tracking, heart rate monitoring, and GPS.",
+    "price": 149.99,
+    "category": "Wearables",
+    "stock": 30,
+    "rating": 4.7,
+    "images": [
+      "https://example.com/images/smartwatch1.jpg",
+      "https://example.com/images/smartwatch2.jpg"
+    ]
+  },
+  {
+    "id": "3",
+    "name": "Gaming Laptop",
+    "description": "Powerful gaming laptop with the latest graphics card and high-speed processor.",
+    "price": 1299.99,
+    "category": "Computers",
+    "stock": 20,
+    "rating": 4.8,
+    "images": [
+      "https://example.com/images/laptop1.jpg",
+      "https://example.com/images/laptop2.jpg"
+    ]
+  },
+  {
+    "id": "4",
+    "name": "Bluetooth Speaker",
+    "description": "Portable Bluetooth speaker with rich sound and deep bass.",
+    "price": 49.99,
+    "category": "Audio",
+    "stock": 100,
+    "rating": 4.6,
+    "images": [
+      "https://example.com/images/speaker1.jpg",
+      "https://example.com/images/speaker2.jpg"
+    ]
+  },
+  {
+    "id": "5",
+    "name": "Electric Kettle",
+    "description": "Fast-boiling electric kettle with auto shut-off and stainless steel body.",
+    "price": 29.99,
+    "category": "Home Appliances",
+    "stock": 40,
+    "rating": 4.3,
+    "images": [
+      "https://example.com/images/kettle1.jpg",
+      "https://example.com/images/kettle2.jpg"
+    ]
+  },
+  {
+    "id": "6",
+    "name": "Running Shoes",
+    "description": "Comfortable and durable running shoes for all terrains.",
+    "price": 79.99,
+    "category": "Footwear",
+    "stock": 60,
+    "rating": 4.4,
+    "images": [
+      "https://example.com/images/shoes1.jpg",
+      "https://example.com/images/shoes2.jpg"
+    ]
+  },
+  {
+    "id": "7",
+    "name": "Smartphone",
+    "description": "Latest smartphone with high-resolution camera and fast processing speed.",
+    "price": 699.99,
+    "category": "Mobile Phones",
+    "stock": 25,
+    "rating": 4.7,
+    "images": [
+      "https://example.com/images/smartphone1.jpg",
+      "https://example.com/images/smartphone2.jpg"
+    ]
+  },
+  {
+    "id": "8",
+    "name": "4K TV",
+    "description": "Ultra HD 4K TV with vibrant colors and smart features.",
+    "price": 499.99,
+    "category": "Television",
+    "stock": 15,
+    "rating": 4.6,
+    "images": [
+      "https://example.com/images/tv1.jpg",
+      "https://example.com/images/tv2.jpg"
+    ]
+  },
+  {
+    "id": "9",
+    "name": "Digital Camera",
+    "description": "Compact digital camera with high-resolution sensor and optical zoom.",
+    "price": 299.99,
+    "category": "Cameras",
+    "stock": 35,
+    "rating": 4.5,
+    "images": [
+      "https://example.com/images/camera1.jpg",
+      "https://example.com/images/camera2.jpg"
+    ]
+  },
+  {
+    "id": "10",
+    "name": "Fitness Tracker",
+    "description": "Lightweight fitness tracker with heart rate monitor and sleep tracking.",
+    "price": 59.99,
+    "category": "Wearables",
+    "stock": 70,
+    "rating": 4.3,
+    "images": [
+      "https://example.com/images/fitnesstracker1.jpg",
+      "https://example.com/images/fitnesstracker2.jpg"
+    ]
+  }
+]

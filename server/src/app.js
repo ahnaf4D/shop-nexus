@@ -4,6 +4,7 @@ import createHttpError from 'http-errors';
 import xssClean from 'xss';
 import { rateLimit } from 'express-rate-limit';
 import { userRouter } from './routers/userRouter.js';
+import seedRouter from './routers/seedRouter.js';
 const app = express();
 const raterLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 app.use(morgan('dev'));
 // routers
 app.use('/api/users', userRouter);
+app.use('/api/seeds', seedRouter);
 // root endpoint below
 app.get(`/`, (req, res) => {
   res.status(200).send({ massage: 'Welcome to the Nexus Server' });

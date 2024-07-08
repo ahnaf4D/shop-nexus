@@ -19,7 +19,7 @@ const port = process.env.PORT || 3001;
 app.get(`/`, (req, res) => {
   res.status(200).send({ massage: 'Welcome to the Nexus Server' });
 });
-app.get(`/api/users`, isLoggedIn, (req, res) => {
+app.get(`/api/user`, isLoggedIn, (req, res) => {
   console.log(`Users authenticate with ${req.body.id}`);
   res.status(200).send({ massage: 'user profile returned' });
 });
@@ -35,7 +35,16 @@ app.put(`/test`, (req, res) => {
 app.delete(`/test`, (req, res) => {
   res.status(200).send({ massage: 'DELETE: API working fine' });
 });
-
+// client error handling middlewares
+app.use((req, res, next) => {
+  res.status(404).json({ massage: 'route not found' });
+  next();
+});
+// http/server error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
 app.listen(port, () => {
   console.log(`server is running at http://localhost:${port}`);
 });

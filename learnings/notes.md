@@ -33,11 +33,11 @@
 
 - Always use Postman software for checking REST services as a backend engineer.
 
-## 7. Express Middlewares
+### 7. Express Middlewares
 
 Middleware functions in Express.js are functions that have access to the request object (`req`), the response object (`res`), and the next middleware function in the application's request-response cycle. They can perform various tasks such as executing code, modifying the request and response objects, ending the request-response cycle, and calling the next middleware in the stack.
 
-### Commonly Used Middlewares
+#### Commonly Used Middlewares
 
 1. **express.json() Middleware**
 
@@ -53,7 +53,7 @@ Middleware functions in Express.js are functions that have access to the request
    ```
    This middleware parses incoming requests with URL-encoded payloads. It is also based on `body-parser` and is built-in in Express. The `extended` option allows you to choose between parsing the URL-encoded data with the `querystring` library (when `false`) or the `qs` library (when `true`). The `qs` library supports rich objects and arrays, which means it can parse nested objects and arrays more effectively.
 
-### Using Middleware in Express
+#### Using Middleware in Express
 
 Here is an example of how you can set up these middlewares in an Express application:
 
@@ -85,7 +85,7 @@ app.listen(PORT, () => {
 });
 ```
 
-### Explanation
+#### Explanation
 
 - `app.use(express.json())`: This middleware is used to parse JSON-formatted request bodies. It is particularly useful when working with APIs that send data in JSON format.
 - `app.use(express.urlencoded({ extended: true }))`: This middleware is used to parse URL-encoded request bodies, commonly used when submitting forms via HTTP POST. The `extended: true` option allows for rich objects and arrays to be encoded into the URL-encoded format.
@@ -93,6 +93,83 @@ app.listen(PORT, () => {
 By using these middlewares, you can easily handle different types of request bodies in your Express application.
 
 ## For more detailed information and advanced usage of middleware in Express, you can refer to the official documentation: [Express.js Guide: Using Middleware](https://expressjs.com/en/guide/using-middleware.html).
+
+### 8. Express Handling Middlewares
+
+Error handling middlewares are essential in Express applications for managing client-side and server-side errors. These middlewares ensure that errors are properly caught and handled, providing useful feedback to the client and logging critical information for the server.
+
+#### Client Error Handling Middleware
+
+The following middleware handles errors related to client requests, such as requesting a non-existent route. It returns a 404 status code with a JSON response indicating that the route was not found.
+
+```javascript
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+```
+
+#### Server Error Handling Middleware
+
+This middleware handles server-side errors that may occur during the processing of requests. It logs the error stack to the console for debugging purposes and sends a 500 status code response to the client, indicating that an internal server error occurred.
+
+```javascript
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+```
+
+#### Full Example
+
+Here's a complete example of an Express application incorporating both client and server error handling middlewares:
+
+```javascript
+const express = require('express');
+const app = express();
+
+// Example route
+app.get('/', (req, res) => {
+  res.send('Hello, world!');
+});
+
+// Client error handling middleware
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// Server error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+```
+
+### Explanation
+
+- **Client Error Handling Middleware**: This middleware catches all unmatched routes and sends a 404 error response to the client.
+
+  ```javascript
+  app.use((req, res, next) => {
+    res.status(404).json({ message: 'Route not found' });
+  });
+  ```
+
+- **Server Error Handling Middleware**: This middleware catches errors that occur during request processing, logs the error details, and sends a 500 error response to the client.
+  ```javascript
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+  });
+  ```
+
+In the next lesson, we will explore a package specifically designed for handling errors more efficiently in Express applications.
+
+For more detailed information on handling errors in Express, refer to the official documentation: [Express.js Guide: Error Handling](https://expressjs.com/en/guide/error-handling.html).
 
 ## Add Some API Testing Endpoints
 

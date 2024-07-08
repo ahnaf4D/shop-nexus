@@ -7,7 +7,11 @@ const getUsers = (req, res, next) => {
     next(error);
   }
 };
-const getUserPosts = (req, res) => {
-  res.status(200).send(posts);
+const getUserPosts = (req, res, next) => {
+  try {
+    res.status(200).send(posts);
+  } catch (error) {
+    next(error);
+  }
 };
 export { getUsers, getUserPosts };

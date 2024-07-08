@@ -1,7 +1,6 @@
 import express from 'express';
-import { getUserPosts, getUsers } from '../controllers/userController.js';
+import { getUsers } from '../controllers/userController.js';
 const userRouter = express.Router();
 
-userRouter.get(`/`, getUserPosts);
-userRouter.get(`/posts`, getUsers);
+userRouter.get(`/`, getUsers);
 export { userRouter };

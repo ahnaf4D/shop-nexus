@@ -527,6 +527,11 @@ This structured document provides a clear outline for connecting to MongoDB usin
 - Explore [Schemas](https://mongoosejs.com/docs/guide.html), [Schema Types](https://mongoosejs.com/docs/schematypes.html).
 - Task for learning Mongoose
 
+### 15. Learn to use seeds api
+
+- Sometimes we need to use dummy data to check health. For that we use seeds api.
+- Learn that always give db name `/{DBNAMe}?retryWrites=true&w=majority&appName=Cluster0` in Atlas and use `mongodb://localhost:27017/{DBName}`
+
 ## Add Some API Testing Endpoints
 
 To ensure your API is functioning correctly, add the following testing endpoints to your Express server:

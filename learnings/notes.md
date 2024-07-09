@@ -532,6 +532,16 @@ This structured document provides a clear outline for connecting to MongoDB usin
 - Sometimes we need to use dummy data to check health. For that we use seeds api.
 - Learn that always give db name `/{DBNAMe}?retryWrites=true&w=majority&appName=Cluster0` in Atlas and use `mongodb://localhost:27017/{DBName}`
 
+### 16. Implement Search , Filter , Pagination features.
+
+- Learn how to filter , pagination , search using mongoose and mongodb and express.
+
+### 17. Implement Response Handler
+
+- These is best practice to make controller for response Control.
+- It can be error response or success response
+- After implement it i am not use like that `res.send()` I use my own controller
+
 ## Add Some API Testing Endpoints
 
 To ensure your API is functioning correctly, add the following testing endpoints to your Express server:

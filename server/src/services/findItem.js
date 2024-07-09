@@ -1,10 +1,9 @@
 import createHttpError from 'http-errors';
-import { User } from '../models/userModel.js';
 import mongoose from 'mongoose';
 
-const findWithId = async (id, item, options = {}) => {
+const findWithId = async (Model, id, item, options = {}) => {
   try {
-    const item = await User.findById(id, options);
+    const item = await Model.findById(id, options);
     if (!item) {
       throw createHttpError(404, `${item} does exists with these id`);
     }

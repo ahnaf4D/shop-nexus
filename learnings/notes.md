@@ -547,6 +547,18 @@ This structured document provides a clear outline for connecting to MongoDB usin
 - Learn that How to get specific users with his id
 - How to validate input and handle success and errors
 
+### 19. Explore the Concept of service
+
+- The functionality that repeated many times we keep it inside the `services/`
+- In these directory we keep the source code of reusable functionality.
+- Learn that How to get specific users with his id
+- How to validate input and handle success and errors
+
+### 20. Delete API for deleting user
+
+- In these lessons I create a delete endpoint for delete a user
+- Also add some code refactoring.
+
 ## Add Some API Testing Endpoints
 
 To ensure your API is functioning correctly, add the following testing endpoints to your Express server:

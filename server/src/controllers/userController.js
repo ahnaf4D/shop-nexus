@@ -1,5 +1,6 @@
 import createHttpError from 'http-errors';
 import { User } from '../models/userModel.js';
+import { successResponse } from './responseController.js';
 
 const getUsers = async (req, res, next) => {
   try {
@@ -22,14 +23,17 @@ const getUsers = async (req, res, next) => {
       .skip((page - 1) * limit);
     const count = await User.find(filter).countDocuments();
     if (!users) throw createHttpError(404, 'User Not Found');
-    res.status(200).send({
-      massage: 'users',
-      users,
-      pagination: {
-        totalPages: Math.ceil(count / limit),
-        currentPage: page,
-        previousPage: page - 1 > 0 ? page - 1 : null,
-        nextPage: page + 1 <= Math.ceil(count / limit) ? page + 1 : null,
+    return successResponse(res, {
+      statusCode: 200,
+      massage: 'users were returned successfully',
+      payload: {
+        users,
+        pagination: {
+          totalPages: Math.ceil(count / limit),
+          currentPage: page,
+          previousPage: page - 1 > 0 ? page - 1 : null,
+          nextPage: page + 1 <= Math.ceil(count / limit) ? page + 1 : null,
+        },
       },
     });
   } catch (error) {

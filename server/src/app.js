@@ -5,6 +5,7 @@ import xssClean from 'xss';
 import { rateLimit } from 'express-rate-limit';
 import { userRouter } from './routers/userRouter.js';
 import seedRouter from './routers/seedRouter.js';
+import { errorResponse } from './controllers/responseController.js';
 const app = express();
 const raterLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
@@ -35,11 +36,16 @@ app.use('/api/seeds', seedRouter);
 app.get(`/`, (req, res) => {
   res.status(200).send({ massage: 'Welcome to the Nexus Server' });
 });
-// error handling
+// Error handling middleware for unknown routes
 app.use((req, res, next) => {
   next(createHttpError(404, 'Route not found'));
 });
+
+// General error handling middleware
 app.use((err, req, res, next) => {
-  res.status(err.status || 500).json({ success: false, message: err.message });
+  return errorResponse(res, {
+    statusCode: err.status,
+    message: err.message,
+  });
 });
 export default app;

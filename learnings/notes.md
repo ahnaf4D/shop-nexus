@@ -559,6 +559,36 @@ This structured document provides a clear outline for connecting to MongoDB usin
 - In these lessons I create a delete endpoint for delete a user
 - Also add some code refactoring.
 
+### 21. Introduce with helper/ directory
+
+- Explore Node.js fs module for managing file system.
+- Create a utility that removes the remove from the file system.
+- I have a confusing That why we going to use `/helper` and `service/` directory.
+
+## Raw Data checking middleware and `xss` middlewares
+
+```javascript
+// raw body checking middleware
+app.use((req, res, next) => {
+  console.log('Raw Body:', req.body);
+  next();
+});
+// xss prevent middleware
+app.use((req, res, next) => {
+  req.body = JSON.parse(
+    JSON.stringify(req.body, (key, value) =>
+      typeof value === 'string' ? xss(value) : value
+    )
+  );
+  req.query = JSON.parse(
+    JSON.stringify(req.query, (key, value) =>
+      typeof value === 'string' ? xss(value) : value
+    )
+  );
+  next();
+});
+```
+
 ## Add Some API Testing Endpoints
 
 To ensure your API is functioning correctly, add the following testing endpoints to your Express server:

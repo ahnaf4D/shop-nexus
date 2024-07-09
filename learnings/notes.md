@@ -542,6 +542,11 @@ This structured document provides a clear outline for connecting to MongoDB usin
 - It can be error response or success response
 - After implement it i am not use like that `res.send()` I use my own controller
 
+### 18. Learn how to find a specific user with his id
+
+- Learn that How to get specific users with his id
+- How to validate input and handle success and errors
+
 ## Add Some API Testing Endpoints
 
 To ensure your API is functioning correctly, add the following testing endpoints to your Express server:

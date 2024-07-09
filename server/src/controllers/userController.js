@@ -1,8 +1,9 @@
 import createHttpError from 'http-errors';
 import { User } from '../models/userModel.js';
 import { successResponse } from './responseController.js';
-import mongoose from 'mongoose';
-
+import { findWithId } from '../services/findItem.js';
+import fs from 'fs';
+import { error } from 'console';
 const getUsers = async (req, res, next) => {
   try {
     const search = req.query.search || '';
@@ -44,14 +45,8 @@ const getUsers = async (req, res, next) => {
 const getUser = async (req, res, next) => {
   try {
     const id = req.params.id;
-    if (!mongoose.isValidObjectId(id)) {
-      throw createHttpError(400, 'Invalid User Id');
-    }
     const options = { password: 0 };
-    const user = await User.findById(id, options);
-    if (!user) {
-      throw createHttpError(404, 'user does exists with these id');
-    }
+    const user = await findWithId(id, 'users', options);
     return successResponse(res, {
       statusCode: 200,
       massage: 'users were returned successfully',
@@ -61,4 +56,32 @@ const getUser = async (req, res, next) => {
     next(error);
   }
 };
-export { getUsers, getUser };
+const deleteUser = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const options = { password: 0 };
+    const user = await findWithId(id, 'users', options);
+    const userImagePath = user.image;
+    fs.access(userImagePath, (err) => {
+      if (err) {
+        console.error('user image does not exits');
+      } else {
+        fs.unlink(userImagePath, (err) => {
+          if (err) throw err;
+          console.log('user image was deleted');
+        });
+      }
+    });
+    await User.findByIdAndDelete({
+      _id: id,
+      isAdmin: false,
+    });
+    return successResponse(res, {
+      statusCode: 200,
+      massage: 'users were deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export { getUsers, getUser, deleteUser };

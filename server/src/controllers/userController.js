@@ -2,8 +2,8 @@ import createHttpError from 'http-errors';
 import { User } from '../models/userModel.js';
 import { successResponse } from './responseController.js';
 import { findWithId } from '../services/findItem.js';
-import fs from 'fs';
-import { error } from 'console';
+import { deleteImage } from '../helper/deleteImage.js';
+
 const getUsers = async (req, res, next) => {
   try {
     const search = req.query.search || '';
@@ -62,16 +62,22 @@ const deleteUserById = async (req, res, next) => {
     const options = { password: 0 };
     const user = await findWithId(User, id, 'users', options);
     const userImagePath = user.image;
-    fs.access(userImagePath, (err) => {
-      if (err) {
-        console.error('user image does not exits');
-      } else {
-        fs.unlink(userImagePath, (err) => {
-          if (err) throw err;
-          console.log('user image was deleted');
-        });
-      }
-    });
+    // fs.access(userImagePath)
+    //   .then(() => fs.unlink(userImagePath))
+    //   .then(() => console.log('user image was deleted'))
+    //   .catch((err) => console.error('user image does not exits'));
+
+    // fs.access(userImagePath, (err) => {
+    //   if (err) {
+    //     console.error('user image does not exits');
+    //   } else {
+    //     fs.unlink(userImagePath, (err) => {
+    //       if (err) throw err;
+    //       console.log('user image was deleted');
+    //     });
+    //   }
+    // });
+    deleteImage(userImagePath);
     await User.findByIdAndDelete({
       _id: id,
       isAdmin: false,
@@ -84,4 +90,25 @@ const deleteUserById = async (req, res, next) => {
     next(error);
   }
 };
-export { getUsers, getUserById, deleteUserById };
+const processRegister = async (req, res, next) => {
+  try {
+    const { name, email, password, phone, address } = req.body;
+    const newUser = {
+      name,
+      email,
+      password,
+      phone,
+      address,
+    };
+    console.log(newUser);
+
+    return successResponse(res, {
+      statusCode: 200,
+      massage: 'user was created successfully',
+      payload: newUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export { getUsers, getUserById, deleteUserById, processRegister };

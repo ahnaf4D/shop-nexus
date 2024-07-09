@@ -8,7 +8,7 @@ import seedRouter from './routers/seedRouter.js';
 const app = express();
 const raterLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
-  limit: 5,
+  limit: 10,
   massage: 'Too many requests from you ip please try again later',
 });
 app.use(raterLimiter);

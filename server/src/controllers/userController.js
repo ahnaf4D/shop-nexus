@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 import { User } from '../models/userModel.js';
 import { successResponse } from './responseController.js';
+import mongoose from 'mongoose';
 
 const getUsers = async (req, res, next) => {
   try {
@@ -40,4 +41,24 @@ const getUsers = async (req, res, next) => {
     next(error);
   }
 };
-export { getUsers };
+const getUser = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    if (!mongoose.isValidObjectId(id)) {
+      throw createHttpError(400, 'Invalid User Id');
+    }
+    const options = { password: 0 };
+    const user = await User.findById(id, options);
+    if (!user) {
+      throw createHttpError(404, 'user does exists with these id');
+    }
+    return successResponse(res, {
+      statusCode: 200,
+      massage: 'users were returned successfully',
+      payload: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export { getUsers, getUser };

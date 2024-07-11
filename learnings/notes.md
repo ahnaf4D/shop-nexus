@@ -565,6 +565,30 @@ This structured document provides a clear outline for connecting to MongoDB usin
 - Create a utility that removes the remove from the file system.
 - I have a confusing That why we going to use `/helper` and `service/` directory.
 
+### 22. Create a user registration system using node.js
+
+- Learn how to implement user registration process in Node.js
+- Implement JWT for User Authentication.
+
+### 23. smtp server setup
+
+- Explore Node Mailer and setup google smtp server
+- Preparing email
+
+### 24. Send Direct email to the User
+
+- Learn how to send account activation email to the user
+- Learn how to verify user with jsonwebtoken
+
+### 25. manage uploaded image file in DB
+
+- Explore the Multer npm package
+
+### 26. Learn uploaded file management
+
+- Filter uploaded files and folder
+- Save files to local folders.
+
 ## Raw Data checking middleware and `xss` middlewares
 
 ```javascript

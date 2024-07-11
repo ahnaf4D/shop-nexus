@@ -3,6 +3,12 @@ import { User } from '../models/userModel.js';
 import { successResponse } from './responseController.js';
 import { findWithId } from '../services/findItem.js';
 import { deleteImage } from '../helper/deleteImage.js';
+import {
+  createJsonWebToken,
+  verifyJsonWebToken,
+} from '../helper/jsonwebtoken.js';
+import { clientUrl, JwtActivationKey } from '../secret.js';
+import { sendEmailWithNodeMailer } from '../helper/email.js';
 
 const getUsers = async (req, res, next) => {
   try {
@@ -62,21 +68,6 @@ const deleteUserById = async (req, res, next) => {
     const options = { password: 0 };
     const user = await findWithId(User, id, 'users', options);
     const userImagePath = user.image;
-    // fs.access(userImagePath)
-    //   .then(() => fs.unlink(userImagePath))
-    //   .then(() => console.log('user image was deleted'))
-    //   .catch((err) => console.error('user image does not exits'));
-
-    // fs.access(userImagePath, (err) => {
-    //   if (err) {
-    //     console.error('user image does not exits');
-    //   } else {
-    //     fs.unlink(userImagePath, (err) => {
-    //       if (err) throw err;
-    //       console.log('user image was deleted');
-    //     });
-    //   }
-    // });
     deleteImage(userImagePath);
     await User.findByIdAndDelete({
       _id: id,
@@ -92,23 +83,78 @@ const deleteUserById = async (req, res, next) => {
 };
 const processRegister = async (req, res, next) => {
   try {
-    const { name, email, password, phone, address } = req.body;
-    const newUser = {
+    const { name, email, password, phone, address, image } = req.body;
+    const userExists = await User.exists({ email: email });
+    if (userExists) {
+      throw createHttpError(
+        409,
+        'User with this email already exists, please login'
+      );
+    }
+    const token = createJsonWebToken('10m', JwtActivationKey, {
       name,
       email,
       password,
       phone,
       address,
+      image,
+    });
+    const emailData = {
+      email,
+      subject: 'Account Activation Email',
+      html: `
+      <h2>Hello ${name}!</h2>
+      <p>Please click here to <a href="${clientUrl}/api/users/activate/${token}" target="_blank">activate your account</a></p>
+      `,
     };
-    console.log(newUser);
 
+    try {
+      sendEmailWithNodeMailer(emailData);
+    } catch (error) {
+      next(createHttpError(500, 'Failed to send verification email'));
+      return;
+    }
     return successResponse(res, {
       statusCode: 200,
-      massage: 'user was created successfully',
-      payload: newUser,
+      message: 'Please activate your account with email',
+      payload: token,
     });
   } catch (error) {
     next(error);
   }
 };
-export { getUsers, getUserById, deleteUserById, processRegister };
+const activateUser = async (req, res, next) => {
+  try {
+    const token = req.body.token;
+    if (!token) throw createHttpError(404, 'token not found');
+    try {
+      const decoded = verifyJsonWebToken(token, JwtActivationKey);
+      if (!decoded) throw createHttpError(405, 'Unable to verify user');
+      const userExists = await User.exists({ email: decoded.email });
+      if (userExists) {
+        throw createHttpError(
+          409,
+          'User with this email already exists, please login'
+        );
+      }
+      await User.create(decoded);
+      console.log('user created'); // user created successfully
+
+      return successResponse(res, {
+        statusCode: 201,
+        message: 'User was registered successfully',
+      });
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw createHttpError(401, 'Token has expired');
+      } else if (error.name === 'JsonWebTokenError') {
+        throw createHttpError(401, 'Invalid Token');
+      } else {
+        throw error;
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+export { getUsers, getUserById, deleteUserById, processRegister, activateUser };

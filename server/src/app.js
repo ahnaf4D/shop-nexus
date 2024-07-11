@@ -46,8 +46,8 @@ app.use((req, res, next) => {
 // General error handling middleware
 app.use((err, req, res, next) => {
   return errorResponse(res, {
-    statusCode: err.status,
-    message: err.message,
+    statusCode: err.status || 500,
+    message: err.message || 'Internal Server Error',
   });
 });
 export default app;

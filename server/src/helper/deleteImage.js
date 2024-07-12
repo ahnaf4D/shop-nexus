@@ -4,16 +4,19 @@ import { CLOUDINARY_CONFIG } from '../config/config.js';
 cloudinary.config(CLOUDINARY_CONFIG);
 
 const extractPublicId = (url) => {
-  try {
-    const parts = url.split('/upload/')[1];
-    const publicId = parts.slice(parts.indexOf('/') + 1);
-    console.log('Extracted publicId:', publicId);
-    return publicId;
-  } catch (error) {
-    console.error('Error extracting publicId from imageUrl:', error.message);
-    return null;
+  const parts = url.split('/');
+  const fileNameWithExtension = parts.pop();
+  const publicId = fileNameWithExtension.split('.')[0];
+  const versionIndex = parts.findIndex((part) => part.startsWith('v'));
+  if (versionIndex !== -1) {
+    parts.splice(versionIndex, 1);
   }
+
+  const folderPath = parts.slice(6).join('/');
+
+  return folderPath ? `${folderPath}/${publicId}` : publicId;
 };
+
 const deleteImage = async (imageUrl) => {
   try {
     const publicId = extractPublicId(imageUrl);

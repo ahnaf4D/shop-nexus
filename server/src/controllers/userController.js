@@ -168,7 +168,7 @@ const activateUser = async (req, res, next) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             folder: 'nexus-shop-assets', // Specify the folder name
-            public_id: `${Date.now()}_${email}`, // Optional: rename uploaded file
+            public_id: `${Date.now()}_${name}`, // Optional: rename uploaded file
           },
           (error, result) => {
             if (error) {

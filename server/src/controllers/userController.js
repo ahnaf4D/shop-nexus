@@ -77,8 +77,8 @@ const deleteUserById = async (req, res, next) => {
     const id = req.params.id;
     const options = { password: 0 };
     const user = await findWithId(User, id, 'users', options);
-    if (user && user.imagePublicId) {
-      await cloudinary.uploader.destroy(user.imagePublicId);
+    if (user) {
+      await deleteImage(user.image);
     }
     await User.findByIdAndDelete({
       _id: id,

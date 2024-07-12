@@ -12,9 +12,9 @@ import { runValidation } from '../validators/index.js';
 const userRouter = express.Router();
 userRouter.post(
   '/process-register',
+  upload.single('image'),
   validateUserRegistration,
   runValidation,
-  upload.single('image'),
   handleMulterError,
   processRegister
 );

@@ -76,8 +76,10 @@ const deleteUserById = async (req, res, next) => {
     const id = req.params.id;
     const options = { password: 0 };
     const user = await findWithId(User, id, 'users', options);
-    const userImagePath = user.image;
-    deleteImage(userImagePath);
+    if (user && user.image) {
+      const userImagePath = user.image;
+      await deleteImage(userImagePath);
+    }
     await User.findByIdAndDelete({
       _id: id,
       isAdmin: false,

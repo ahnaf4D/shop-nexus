@@ -1,11 +1,23 @@
-import fs from 'fs/promises';
-const deleteImage = async (userImagePath) => {
+import { v2 as cloudinary } from 'cloudinary';
+import { CLOUDINARY_CONFIG } from '../config/config.js';
+cloudinary.config(CLOUDINARY_CONFIG);
+const extractPublicFormUrl = (url) => {
+  const parts = url.split('/');
+  const publicIdWithExt = parts[parts.length - 1];
+  const publicId = publicIdWithExt.split('.')[0];
+  return publicId;
+};
+const deleteImage = async (imageUrl) => {
   try {
-    await fs.access(userImagePath);
-    await fs.unlink(userImagePath);
-    console.log('user image was deleted');
+    const publicId = extractPublicFormUrl(imageUrl);
+    const result = await cloudinary.uploader.destroy(publicId);
+    if (result.result === 'ok') {
+      console.log('image deleted successfully from cloudinary');
+    } else {
+      console.error('Failed to delete user image from cloudinary');
+    }
   } catch (error) {
-    console.error('user image does not exits');
+    console.error('Error deleting user image from cloudinary : ', error);
   }
 };
 export { deleteImage };

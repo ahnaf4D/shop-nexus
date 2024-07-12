@@ -37,35 +37,4 @@ const handleMulterError = (err, req, res, next) => {
   next();
 };
 
-const uploadToCloudinary = async (req, res, next) => {
-  try {
-    if (!req.file) {
-      throw new Error('No file uploaded');
-    }
-
-    const result = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        {
-          folder: 'nexus-shop-assets', // Specify the folder name
-          public_id: `${Date.now()}_${path.parse(req.file.originalname).name}`, // Optional: rename uploaded file
-        },
-        (error, result) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(result);
-          }
-        }
-      );
-
-      stream.end(req.file.buffer);
-    });
-
-    req.cloudinaryUrl = result.secure_url;
-    next();
-  } catch (error) {
-    next(createHttpError(400, error.message));
-  }
-};
-
-export { upload, handleMulterError, uploadToCloudinary };
+export { upload, handleMulterError };

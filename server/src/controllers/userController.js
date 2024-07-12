@@ -11,6 +11,7 @@ import {
 import { clientUrl, JwtActivationKey } from '../secret.js';
 import { sendEmailWithNodeMailer } from '../helper/email.js';
 import { CLOUDINARY_CONFIG } from '../config/config.js';
+import { addImageBuffer, getImageBuffer } from '../helper/storeBuffer.js';
 cloudinary.config(CLOUDINARY_CONFIG);
 const getUsers = async (req, res, next) => {
   try {
@@ -76,9 +77,8 @@ const deleteUserById = async (req, res, next) => {
     const id = req.params.id;
     const options = { password: 0 };
     const user = await findWithId(User, id, 'users', options);
-    if (user && user.image) {
-      const userImagePath = user.image;
-      await deleteImage(userImagePath);
+    if (user && user.imagePublicId) {
+      await cloudinary.uploader.destroy(user.imagePublicId);
     }
     await User.findByIdAndDelete({
       _id: id,
@@ -86,7 +86,7 @@ const deleteUserById = async (req, res, next) => {
     });
     return successResponse(res, {
       statusCode: 200,
-      massage: 'users were deleted successfully',
+      message: 'User was deleted successfully',
     });
   } catch (error) {
     next(error);
@@ -95,10 +95,8 @@ const deleteUserById = async (req, res, next) => {
 const processRegister = async (req, res, next) => {
   try {
     const { name, email, password, phone, address } = req.body;
-    console.log(`email from the body ${email}`); // Check if email is undefined here.
-    const imageUrl = req.cloudinaryUrl; // Use the Cloudinary URL from the previous middleware
+    const imageBuffer = req.file.buffer; // Save image in memory buffer
 
-    // Check if the user already exists
     const userExists = await User.exists({ email });
     if (userExists) {
       throw createHttpError(
@@ -107,17 +105,17 @@ const processRegister = async (req, res, next) => {
       );
     }
 
-    // Create a JWT token for account activation
+    // Save the image buffer to the temporary storage
+    addImageBuffer(email, imageBuffer);
+
     const token = createJsonWebToken('10m', JwtActivationKey, {
       name,
       email,
       password,
       phone,
       address,
-      imageUrl,
     });
 
-    // Email data for sending the activation link
     const emailData = {
       email,
       subject: 'Account Activation Email',
@@ -127,7 +125,6 @@ const processRegister = async (req, res, next) => {
       `,
     };
 
-    // Send the activation email
     try {
       await sendEmailWithNodeMailer(emailData);
     } catch (error) {
@@ -135,7 +132,6 @@ const processRegister = async (req, res, next) => {
       return;
     }
 
-    // Send success response
     return successResponse(res, {
       statusCode: 200,
       message: 'Please activate your account with email',
@@ -162,7 +158,29 @@ const activateUser = async (req, res, next) => {
         );
       }
 
-      const { name, email, password, phone, address, imageUrl } = decoded;
+      const { name, email, password, phone, address } = decoded;
+
+      // Retrieve the image buffer from the temporary storage
+      const imageBuffer = getImageBuffer(email);
+      if (!imageBuffer) throw createHttpError(404, 'Image not found');
+
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'nexus-shop-assets', // Specify the folder name
+            public_id: `${Date.now()}_${email}`, // Optional: rename uploaded file
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+
+        stream.end(imageBuffer); // Use the image buffer from the temporary storage
+      });
 
       const user = await User.create({
         name,
@@ -170,7 +188,8 @@ const activateUser = async (req, res, next) => {
         password,
         phone,
         address,
-        image: imageUrl, // Use the Cloudinary URL here
+        image: result.secure_url, // Use the Cloudinary URL here
+        imagePublicId: result.public_id, // Save the public ID in the database
       });
 
       return successResponse(res, {
@@ -190,4 +209,5 @@ const activateUser = async (req, res, next) => {
     next(error);
   }
 };
+
 export { getUsers, getUserById, deleteUserById, processRegister, activateUser };

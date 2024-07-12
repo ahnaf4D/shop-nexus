@@ -6,20 +6,15 @@ import {
   processRegister,
   activateUser,
 } from '../controllers/userController.js';
-import {
-  handleMulterError,
-  upload,
-  uploadToCloudinary,
-} from '../middlewares/uploadFiles.js';
+import { handleMulterError, upload } from '../middlewares/uploadFiles.js';
 const userRouter = express.Router();
 userRouter.post(
-  `/process-register`,
+  '/process-register',
   upload.single('image'),
   handleMulterError,
-  uploadToCloudinary,
   processRegister
 );
-userRouter.post(`/verify`, activateUser);
+userRouter.post('/verify', activateUser);
 userRouter.get(`/`, getUsers);
 userRouter.get(`/:id`, getUserById);
 userRouter.delete(`/:id`, deleteUserById);

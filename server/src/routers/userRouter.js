@@ -7,9 +7,13 @@ import {
   activateUser,
 } from '../controllers/userController.js';
 import { handleMulterError, upload } from '../middlewares/uploadFiles.js';
+import { validateUserRegistration } from '../validators/auth.js';
+import { runValidation } from '../validators/index.js';
 const userRouter = express.Router();
 userRouter.post(
   '/process-register',
+  validateUserRegistration,
+  runValidation,
   upload.single('image'),
   handleMulterError,
   processRegister

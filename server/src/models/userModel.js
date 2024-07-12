@@ -1,5 +1,5 @@
 import mongoose, { model, Schema } from 'mongoose';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { defaultImagePath } from '../secret.js';
 const userSchema = new Schema(
   {

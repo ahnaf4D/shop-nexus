@@ -32,6 +32,4 @@ const isLoggedOut = async (req, res, next) => {
     next(error);
   }
 };
-// isLoggedIn Middleware steps
-// 1. is token is available in the cookie
 export { isLoggedIn, isLoggedOut };

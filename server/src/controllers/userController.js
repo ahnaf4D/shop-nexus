@@ -2,7 +2,6 @@ import createHttpError from 'http-errors';
 import { User } from '../models/userModel.js';
 import { successResponse } from './responseController.js';
 import { findWithId } from '../services/findItem.js';
-import { deleteImage, extractPublicId } from '../helper/deleteImage.js';
 import { v2 as cloudinary } from 'cloudinary';
 import {
   createJsonWebToken,
@@ -13,7 +12,14 @@ import { sendEmailWithNodeMailer } from '../helper/email.js';
 import { CLOUDINARY_CONFIG } from '../config/config.js';
 import { addImageBuffer, getImageBuffer } from '../helper/storeBuffer.js';
 import { runValidation } from '../validators/index.js';
+import {
+  deleteImage,
+  updateUserImage,
+  uploadImage,
+} from '../helper/cloudinary.js';
+
 cloudinary.config(CLOUDINARY_CONFIG);
+
 const getUsers = async (req, res, next) => {
   try {
     const search = req.query.search || '';
@@ -29,15 +35,16 @@ const getUsers = async (req, res, next) => {
       ],
     };
     const options = { password: 0 };
-    // 24 users
+
     const users = await User.find(filter, options)
       .limit(limit)
       .skip((page - 1) * limit);
     const count = await User.find(filter).countDocuments();
     if (!users) throw createHttpError(404, 'User Not Found');
+
     return successResponse(res, {
       statusCode: 200,
-      massage: 'users were returned successfully',
+      message: 'Users were returned successfully',
       payload: {
         users,
         pagination: {
@@ -52,6 +59,7 @@ const getUsers = async (req, res, next) => {
     next(error);
   }
 };
+
 const getUserById = async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -73,6 +81,7 @@ const getUserById = async (req, res, next) => {
     next(error);
   }
 };
+
 const deleteUserById = async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -93,6 +102,7 @@ const deleteUserById = async (req, res, next) => {
     next(error);
   }
 };
+
 const processRegister = async (req, res, next) => {
   try {
     const { name, email, password, phone, address } = req.body;
@@ -106,9 +116,7 @@ const processRegister = async (req, res, next) => {
       );
     }
 
-    // Save the image buffer to the temporary storage
-    addImageBuffer(email, imageBuffer);
-
+    addImageBuffer(email, imageBuffer); // save image to buffer
     const token = createJsonWebToken('10m', JwtActivationKey, {
       name,
       email,
@@ -142,6 +150,7 @@ const processRegister = async (req, res, next) => {
     next(error);
   }
 };
+
 const activateUser = async (req, res, next) => {
   try {
     const token = req.body.token;
@@ -165,25 +174,10 @@ const activateUser = async (req, res, next) => {
       const imageBuffer = getImageBuffer(email);
       if (!imageBuffer) throw createHttpError(404, 'Image not found');
 
-      const result = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: 'nexus-shop-assets', // Specify the folder name
-            public_id: `${Date.now()}_${name.split(' ')[0]}`, // Optional: rename uploaded file
-          },
-          (error, result) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(result);
-            }
-          }
-        );
+      const result = await uploadImage(imageBuffer, name);
+      console.log(result);
 
-        stream.end(imageBuffer); // Use the image buffer from the temporary storage
-      });
-
-      const user = await User.create({
+      await User.create({
         name,
         email,
         password,
@@ -210,16 +204,20 @@ const activateUser = async (req, res, next) => {
     next(error);
   }
 };
+
 const updateUserById = async (req, res, next) => {
-  console.log('hit on the update server');
   try {
     const userId = req.params.id;
-    const updateOptions = { new: true, runValidation: true, context: 'query' };
+    const updateOptions = { new: true, runValidators: true, context: 'query' };
     let update = {};
-    if (req.body.name) update.name = req.body.name;
-    if (req.body.password) update.password = req.body.password;
-    if (req.body.phone) update.phone = req.body.phone;
-    if (req.body.address) update.address = req.body.address;
+
+    // Update fields from request body
+    for (let key in req.body) {
+      if (['name', 'password', 'phone', 'address'].includes(key)) {
+        update[key] = req.body[key];
+      }
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       return successResponse(res, {
@@ -227,28 +225,12 @@ const updateUserById = async (req, res, next) => {
         message: 'User Not Found',
       });
     }
+
     const image = req.file;
     if (image) {
-      const publicId = user.image ? extractPublicId(user.image) : userId;
-      console.log(publicId);
       try {
-        await cloudinary.uploader
-          .upload_stream(
-            {
-              folder: 'nexus-shop-assets',
-              public_id: publicId,
-              overwrite: true,
-              resource_type: 'image',
-            },
-            (error, result) => {
-              if (error) {
-                console.error('Error uploading to Cloudinary:', error);
-                throw error;
-              }
-              update.image = result.secure_url;
-            }
-          )
-          .end(image.buffer);
+        const result = await updateUserImage(image.buffer, user.image, userId);
+        update.image = result.secure_url;
       } catch (uploadError) {
         return res.status(500).json({
           success: false,
@@ -262,7 +244,7 @@ const updateUserById = async (req, res, next) => {
       userId,
       update,
       updateOptions
-    );
+    ).select('-password');
 
     if (!updatedUser) {
       return res.status(404).json({
@@ -284,6 +266,7 @@ const updateUserById = async (req, res, next) => {
     });
   }
 };
+
 export {
   getUsers,
   getUserById,

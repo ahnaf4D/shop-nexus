@@ -12,7 +12,7 @@ const isLoggedIn = async (req, res, next) => {
     if (!decoded) {
       throw createHttpError(401, 'Invalid Access Token');
     }
-    req.body.userId = decoded.userId;
+    req.user = decoded.user;
     next();
   } catch (error) {
     next(error);
@@ -32,4 +32,21 @@ const isLoggedOut = async (req, res, next) => {
     next(error);
   }
 };
-export { isLoggedIn, isLoggedOut };
+const isAdmin = async (req, res, next) => {
+  try {
+    console.log('from admin : ', req.user.isAdmin);
+    // if user isAdmin status `false` user see the error below
+    if (req.user.isAdmin === false) {
+      console.log(req.user.isAdmin);
+      throw createHttpError(
+        403,
+        'Forbidden. You must be an admin to access these resource'
+      );
+    }
+    next();
+  } catch (error) {
+    next();
+  }
+};
+
+export { isLoggedIn, isLoggedOut, isAdmin };

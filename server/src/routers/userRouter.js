@@ -10,8 +10,10 @@ import {
 import { handleMulterError, upload } from '../middlewares/uploadFiles.js';
 import { validateUserRegistration } from '../validators/auth.js';
 import { runValidation } from '../validators/index.js';
-import { isLoggedIn, isLoggedOut } from '../middlewares/auth.js';
+import { isAdmin, isLoggedIn, isLoggedOut } from '../middlewares/auth.js';
+
 const userRouter = express.Router();
+
 userRouter.post(
   '/process-register',
   isLoggedOut,
@@ -21,15 +23,17 @@ userRouter.post(
   handleMulterError,
   processRegister
 );
+
 userRouter.post('/verify', isLoggedOut, activateUser);
-userRouter.get(`/`, getUsers);
-userRouter.get(`/:id`, isLoggedIn, getUserById);
-userRouter.delete(`/:id`, deleteUserById);
+userRouter.get('/', isLoggedIn, isAdmin, getUsers);
+userRouter.get('/:id', isLoggedIn, getUserById);
+userRouter.delete('/:id', isLoggedIn, isAdmin, deleteUserById);
 userRouter.put(
-  `/:id`,
+  '/:id',
   upload.single('image'),
   handleMulterError,
   isLoggedIn,
   updateUserById
 );
+
 export { userRouter };

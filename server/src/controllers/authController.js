@@ -31,10 +31,8 @@ const userLogin = async (req, res, next) => {
         'You are banned. Please contact the authority'
       );
     }
-
-    // Generate token and set httpOnly cookie
     const accessToken = createJsonWebToken('10m', JwtAccessKey, {
-      userId: user._id,
+      user,
     });
     res.cookie('accessToken', accessToken, {
       maxAge: 10 * 60 * 1000, // 10 minutes

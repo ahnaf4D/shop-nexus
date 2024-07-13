@@ -30,7 +30,7 @@ const validateUserRegistration = [
     .withMessage('Address should be at least 3 characters long'),
 
   body('phone').trim().notEmpty().withMessage('Phone is required'),
-  body('image').optional().isString().withMessage('Phone is required'),
+  body('image').optional().isString().withMessage('Image is required'),
 ];
 // sign in validation
 export { validateUserRegistration };

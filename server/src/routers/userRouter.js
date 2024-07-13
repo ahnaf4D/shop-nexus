@@ -5,6 +5,7 @@ import {
   deleteUserById,
   processRegister,
   activateUser,
+  updateUserById,
 } from '../controllers/userController.js';
 import { handleMulterError, upload } from '../middlewares/uploadFiles.js';
 import { validateUserRegistration } from '../validators/auth.js';
@@ -22,4 +23,10 @@ userRouter.post('/verify', activateUser);
 userRouter.get(`/`, getUsers);
 userRouter.get(`/:id`, getUserById);
 userRouter.delete(`/:id`, deleteUserById);
+userRouter.put(
+  `/:id`,
+  upload.single('image'),
+  handleMulterError,
+  updateUserById
+);
 export { userRouter };

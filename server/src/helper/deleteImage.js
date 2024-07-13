@@ -37,4 +37,4 @@ const deleteImage = async (imageUrl) => {
   }
 };
 
-export { deleteImage };
+export { deleteImage, extractPublicId };

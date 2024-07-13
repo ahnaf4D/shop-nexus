@@ -2,7 +2,7 @@ import createHttpError from 'http-errors';
 import { User } from '../models/userModel.js';
 import { successResponse } from './responseController.js';
 import { findWithId } from '../services/findItem.js';
-import { deleteImage } from '../helper/deleteImage.js';
+import { deleteImage, extractPublicId } from '../helper/deleteImage.js';
 import { v2 as cloudinary } from 'cloudinary';
 import {
   createJsonWebToken,
@@ -12,6 +12,7 @@ import { clientUrl, JwtActivationKey } from '../secret.js';
 import { sendEmailWithNodeMailer } from '../helper/email.js';
 import { CLOUDINARY_CONFIG } from '../config/config.js';
 import { addImageBuffer, getImageBuffer } from '../helper/storeBuffer.js';
+import { runValidation } from '../validators/index.js';
 cloudinary.config(CLOUDINARY_CONFIG);
 const getUsers = async (req, res, next) => {
   try {
@@ -168,7 +169,7 @@ const activateUser = async (req, res, next) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             folder: 'nexus-shop-assets', // Specify the folder name
-            public_id: `${Date.now()}_${name}`, // Optional: rename uploaded file
+            public_id: `${Date.now()}_${name.split(' ')[0]}`, // Optional: rename uploaded file
           },
           (error, result) => {
             if (error) {
@@ -209,5 +210,85 @@ const activateUser = async (req, res, next) => {
     next(error);
   }
 };
+const updateUserById = async (req, res, next) => {
+  console.log('hit on the update server');
+  try {
+    const userId = req.params.id;
+    const updateOptions = { new: true, runValidation: true, context: 'query' };
+    let update = {};
+    if (req.body.name) update.name = req.body.name;
+    if (req.body.password) update.password = req.body.password;
+    if (req.body.phone) update.phone = req.body.phone;
+    if (req.body.address) update.address = req.body.address;
+    const user = await User.findById(userId);
+    if (!user) {
+      return successResponse(res, {
+        statusCode: 404,
+        message: 'User Not Found',
+      });
+    }
+    const image = req.file;
+    if (image) {
+      const publicId = user.image ? extractPublicId(user.image) : userId;
+      console.log(publicId);
+      try {
+        await cloudinary.uploader
+          .upload_stream(
+            {
+              folder: 'nexus-shop-assets',
+              public_id: publicId,
+              overwrite: true,
+              resource_type: 'image',
+            },
+            (error, result) => {
+              if (error) {
+                console.error('Error uploading to Cloudinary:', error);
+                throw error;
+              }
+              update.image = result.secure_url;
+            }
+          )
+          .end(image.buffer);
+      } catch (uploadError) {
+        return res.status(500).json({
+          success: false,
+          message: 'Error uploading image',
+        });
+      }
+    }
 
-export { getUsers, getUserById, deleteUserById, processRegister, activateUser };
+    // Update user in the database
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      update,
+      updateOptions
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User Not Found',
+      });
+    }
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: 'User updated successfully',
+      payload: updatedUser,
+    });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    });
+  }
+};
+export {
+  getUsers,
+  getUserById,
+  deleteUserById,
+  processRegister,
+  activateUser,
+  updateUserById,
+};

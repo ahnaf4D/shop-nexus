@@ -2,10 +2,12 @@ import express from 'express';
 import morgan from 'morgan';
 import createHttpError from 'http-errors';
 import xss from 'xss';
+import cookieParser from 'cookie-parser';
 import { rateLimit } from 'express-rate-limit';
 import { userRouter } from './routers/userRouter.js';
 import seedRouter from './routers/seedRouter.js';
 import { errorResponse } from './controllers/responseController.js';
+import authRouter from './routers/authRouter.js';
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -16,6 +18,7 @@ const raterLimiter = rateLimit({
 });
 app.use(raterLimiter);
 app.use(morgan('dev'));
+app.use(cookieParser());
 // xss attack prevent endpoint
 app.use((req, res, next) => {
   req.body = JSON.parse(
@@ -34,6 +37,7 @@ app.use((req, res, next) => {
 // routers
 app.use('/api/users', userRouter);
 app.use('/api/seeds', seedRouter);
+app.use('/api/auth', authRouter);
 // root endpoint below
 app.get(`/`, (req, res) => {
   res.status(200).send({ massage: 'Welcome to the Nexus Server' });

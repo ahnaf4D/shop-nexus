@@ -589,6 +589,15 @@ This structured document provides a clear outline for connecting to MongoDB usin
 - Filter uploaded files and folder
 - Save files to local folders.
 
+### 27. Explore Cloudinary
+
+- Save uploaded folder to a specific directory in the cloudinary
+- Implement deleting image features from cloudinary when user actually removed.
+- Update images in Cloudinary within user account deletation process
+- Learn about the helper functions
+
+### 28. User Authentication : User Login
+
 ## Raw Data checking middleware and `xss` middlewares
 
 ```javascript

@@ -60,8 +60,6 @@ const uploadImage = async (imageBuffer, name) => {
     throw error;
   }
 };
-
-// Update user image in Cloudinary
 const updateUserImage = async (imageBuffer, currentImageUrl, name) => {
   try {
     if (currentImageUrl) {

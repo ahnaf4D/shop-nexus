@@ -175,7 +175,6 @@ const activateUser = async (req, res, next) => {
       if (!imageBuffer) throw createHttpError(404, 'Image not found');
 
       const result = await uploadImage(imageBuffer, name);
-      console.log(result);
 
       await User.create({
         name,
@@ -229,7 +228,11 @@ const updateUserById = async (req, res, next) => {
     const image = req.file;
     if (image) {
       try {
-        const result = await updateUserImage(image.buffer, user.image, userId);
+        const result = await updateUserImage(
+          image.buffer,
+          user.image,
+          user.name
+        );
         update.image = result.secure_url;
       } catch (uploadError) {
         return res.status(500).json({

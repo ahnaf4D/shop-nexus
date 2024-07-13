@@ -1,5 +1,4 @@
 import { body } from 'express-validator';
-console.log(body);
 const validateUserRegistration = [
   body('name')
     .trim()

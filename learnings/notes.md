@@ -596,7 +596,48 @@ This structured document provides a clear outline for connecting to MongoDB usin
 - Update images in Cloudinary within user account deletation process
 - Learn about the helper functions
 
-### 28. User Authentication : User Login
+Sure, here's a more professional version of the README section for user authentication, written in markdown:
+
+---
+
+### 28. User Authentication: User Login
+
+#### User Login Process
+
+1. **Extract User Email and Password from `req.body`:**
+
+   - Retrieve the user's email and password from the request body.
+
+2. **Verify Email Existence in the Database:**
+
+   - Check if the email exists in the database.
+   - If the email exists, proceed to the next step.
+   - If the email does not exist, throw a 404 error with the message:  
+     _"User does not exist with this email, please register first."_
+
+3. **Validate the Provided Password:**
+
+   - Decrypt the stored password in the database and compare it with the provided password.
+   - If the passwords match, proceed to the next step.
+   - If the passwords do not match, throw a 401 error with the message:  
+     _"Email or password is invalid."_
+
+4. **Check User Ban Status:**
+
+   - If the user is banned, throw a 401 error with the message:  
+     _"You are banned. Please contact the authority."_
+
+5. **Generate a JWT Token:**
+
+   - Include the user's email in the token payload.
+   - Set the token expiration time.
+   - Save the token in the user's browser as an HTTP-only cookie.
+
+6. **Successfully Log in the User:**
+
+   - Return a success response indicating the user has logged in.
+
+7.
 
 ## Raw Data checking middleware and `xss` middlewares
 

@@ -13,37 +13,44 @@ const userLogin = async (req, res, next) => {
       throw createHttpError(400, 'Email and password are required');
     }
 
-    // Check if the user exists
-    const user = await User.findOne({ email });
+    // Check if the user exists and include the password for comparison
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       throw createHttpError(
         404,
         'User does not exist with this email, please register first'
       );
     }
+
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
       throw createHttpError(401, 'Email or password did not match');
     }
+
     if (user.isBanned) {
       throw createHttpError(
         401,
         'You are banned. Please contact the authority'
       );
     }
+    const userWithoutPass = await User.findOne({ email }).select('-password');
+    // Create access token
     const accessToken = createJsonWebToken('10m', JwtAccessKey, {
-      user,
+      userWithoutPass,
     });
+
+    // Set access token as a cookie
     res.cookie('accessToken', accessToken, {
       maxAge: 10 * 60 * 1000, // 10 minutes
       httpOnly: true,
       secure: true,
       sameSite: 'none',
     });
+
     return successResponse(res, {
       statusCode: 200,
       message: 'User logged in successfully',
-      payload: { user },
+      payload: { userWithoutPass },
     });
   } catch (error) {
     next(error);

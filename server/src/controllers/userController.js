@@ -12,11 +12,14 @@ import { sendEmailWithNodeMailer } from '../helper/email.js';
 import { CLOUDINARY_CONFIG } from '../config/config.js';
 import { addImageBuffer, getImageBuffer } from '../helper/storeBuffer.js';
 import { runValidation } from '../validators/index.js';
+import { updateUserImage, uploadImage } from '../helper/cloudinary.js';
 import {
-  deleteImage,
-  updateUserImage,
-  uploadImage,
-} from '../helper/cloudinary.js';
+  deleteUserWithId,
+  findUserById,
+  findUsers,
+  updateUserPasswordById,
+  updateUserWithId,
+} from '../services/userService.js';
 
 cloudinary.config(CLOUDINARY_CONFIG);
 
@@ -25,50 +28,24 @@ const getUsers = async (req, res, next) => {
     const search = req.query.search || '';
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 5;
-    const searchRegExp = new RegExp('.*' + search + '.*', 'i');
-    const filter = {
-      isAdmin: { $ne: true },
-      $or: [
-        { name: { $regex: searchRegExp } },
-        { email: { $regex: searchRegExp } },
-        { phone: { $regex: searchRegExp } },
-      ],
-    };
-    const options = { password: 0 };
-
-    const users = await User.find(filter, options)
-      .limit(limit)
-      .skip((page - 1) * limit);
-    const count = await User.find(filter).countDocuments();
-    if (!users) throw createHttpError(404, 'User Not Found');
-
+    const { users, pagination } = await findUsers(search, limit, page);
     return successResponse(res, {
       statusCode: 200,
       message: 'Users were returned successfully',
       payload: {
         users,
-        pagination: {
-          totalPages: Math.ceil(count / limit),
-          currentPage: page,
-          previousPage: page - 1 > 0 ? page - 1 : null,
-          nextPage: page + 1 <= Math.ceil(count / limit) ? page + 1 : null,
-        },
+        pagination,
       },
     });
   } catch (error) {
     next(error);
   }
 };
-
 const getUserById = async (req, res, next) => {
   try {
     const id = req.params.id;
     const options = { password: 0 };
-    const user = await findWithId(User, id, 'users', options);
-
-    if (!user) {
-      throw createHttpError(404, 'User not found');
-    }
+    const user = await findUserById(id, options);
 
     return successResponse(res, {
       statusCode: 200,
@@ -81,19 +58,11 @@ const getUserById = async (req, res, next) => {
     next(error);
   }
 };
-
 const deleteUserById = async (req, res, next) => {
   try {
     const id = req.params.id;
     const options = { password: 0 };
-    const user = await findWithId(User, id, 'users', options);
-    if (user) {
-      await deleteImage(user.image);
-    }
-    await User.findByIdAndDelete({
-      _id: id,
-      isAdmin: false,
-    });
+    await deleteUserWithId(id, options);
     return successResponse(res, {
       statusCode: 200,
       message: 'User was deleted successfully',
@@ -207,54 +176,7 @@ const activateUser = async (req, res, next) => {
 const updateUserById = async (req, res, next) => {
   try {
     const userId = req.params.id;
-    const updateOptions = { new: true, runValidators: true, context: 'query' };
-    let update = {};
-
-    // Update fields from request body
-    for (let key in req.body) {
-      if (['name', 'password', 'phone', 'address'].includes(key)) {
-        update[key] = req.body[key];
-      }
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return successResponse(res, {
-        statusCode: 404,
-        message: 'User Not Found',
-      });
-    }
-
-    const image = req.file;
-    if (image) {
-      try {
-        const result = await updateUserImage(
-          image.buffer,
-          user.image,
-          user.name
-        );
-        update.image = result.secure_url;
-      } catch (uploadError) {
-        return res.status(500).json({
-          success: false,
-          message: 'Error uploading image',
-        });
-      }
-    }
-
-    // Update user in the database
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      update,
-      updateOptions
-    ).select('-password');
-
-    if (!updatedUser) {
-      return res.status(404).json({
-        success: false,
-        message: 'User Not Found',
-      });
-    }
+    const updatedUser = await updateUserWithId(userId, req);
 
     return successResponse(res, {
       statusCode: 200,
@@ -269,7 +191,72 @@ const updateUserById = async (req, res, next) => {
     });
   }
 };
-
+const banUserById = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    await findWithId(User, userId);
+    const updates = { isBanned: true };
+    const updateOptions = { new: true, runValidation: true, context: 'query' };
+    const updateUser = await User.findByIdAndUpdate(
+      userId,
+      updates,
+      updateOptions
+    ).select('-password');
+    if (!updateUser) {
+      throw createHttpError(404, 'User was not banned successfully');
+    }
+    return successResponse(res, {
+      statusCode: 200,
+      message: 'user was banned successfully',
+      payload: updateUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const unBanUserById = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    await findWithId(User, userId);
+    const updates = { isBanned: false };
+    const updateOptions = { new: true, runValidation: true, context: 'query' };
+    const updateUser = await User.findByIdAndUpdate(
+      userId,
+      updates,
+      updateOptions
+    ).select('-password');
+    if (!updateUser) {
+      throw createHttpError(404, 'User was not unbanned successfully');
+    }
+    return successResponse(res, {
+      statusCode: 200,
+      message: 'user was unbanned successfully',
+      payload: updateUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const updateUserPassword = async (req, res, next) => {
+  try {
+    const { email, oldPassword, newPassword, confirmPassword } = req.body;
+    const userId = req.params.id;
+    const updatedUser = await updateUserPasswordById(
+      email,
+      userId,
+      oldPassword,
+      newPassword,
+      confirmPassword
+    );
+    return successResponse(res, {
+      statusCode: 200,
+      message: 'user password was updated successfully',
+      payload: { updatedUser },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export {
   getUsers,
   getUserById,
@@ -277,4 +264,7 @@ export {
   processRegister,
   activateUser,
   updateUserById,
+  banUserById,
+  unBanUserById,
+  updateUserPassword,
 };

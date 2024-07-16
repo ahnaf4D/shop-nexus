@@ -1,32 +1,12 @@
 const data = {
   users: [
     {
-      name: 'Md. Abdullah Rahman',
-      email: 'abdullah@example.com',
-      password: 'Zf5!e@Lq7$',
-      phone: '+8801712345678',
-      address: 'Dhanmondi, Dhaka',
-    },
-    {
-      name: 'Kamal Hossain',
-      email: 'kamal@example.com',
-      password: 'X*6rD#8t@',
-      phone: '+8801912345678',
-      address: 'Banani, Dhaka',
-    },
-    {
-      name: 'Jahan',
-      email: 'jahan@example.com',
-      password: 'Gh3&fP$2@',
-      phone: '+8801812345678',
-      address: 'Mirpur, Dhaka',
-    },
-    {
-      name: 'Hasan Ali',
-      email: 'hasan@example.com',
-      password: 'Q!9hG@2p*',
-      phone: '+8801512345678',
-      address: 'Mohammadpur, Dhaka',
+      name: 'Ahnaf Tahmid',
+      email: 'ahnaf@dummy1.com',
+      password: 'were5645%^',
+      phone: '+821414447',
+      address: 'Mountain View, CA, USA',
+      image: 'https://randomuser.me/api/portraits/men/1.jpg',
     },
     {
       name: 'Jordan Boyd',
@@ -34,20 +14,7 @@ const data = {
       phone: '+1-839-956-9140x77150',
       address: 'Unit 1177 Box 2499\nDPO AA 40997',
       password: 'AI(4U9m+0pg!',
-    },
-    {
-      name: 'Christina Miller',
-      email: 'cherylcrawford@hotmail.com',
-      phone: '619-332-4835',
-      address: '4586 Adrienne Springs Suite 225\nLoriburgh, MD 21319',
-      password: 'J^O)$Yi&!q46',
-    },
-    {
-      name: 'Brandy Garcia',
-      email: 'dkent@gmail.com',
-      phone: '157.866.3021',
-      address: '02779 Ashley Unions\nMonicaport, WA 68653',
-      password: '8CMOsUEW_E3)',
+      image: 'https://randomuser.me/api/portraits/men/2.jpg',
     },
     {
       name: 'David Osborn',
@@ -55,6 +22,7 @@ const data = {
       phone: '418.470.0385',
       address: 'USNS Grimes\nFPO AA 08842',
       password: 'T8+RCSQr$g57',
+      image: 'https://randomuser.me/api/portraits/men/3.jpg',
     },
     {
       name: 'Dominic Hess',
@@ -62,13 +30,7 @@ const data = {
       phone: '+1-487-012-7714x2857',
       address: '325 Sara Port\nPageborough, CO 18915',
       password: 'A)$zb8Ko_^B&',
-    },
-    {
-      name: 'Carolyn Lynn',
-      email: 'dtorres@humphrey.com',
-      phone: '321-561-4776x9711',
-      address: '68797 Rhodes Shores\nParkerton, PA 88087',
-      password: '&3l7DGyD+b^#',
+      image: 'https://randomuser.me/api/portraits/men/4.jpg',
     },
     {
       name: 'Craig Wood',
@@ -76,6 +38,7 @@ const data = {
       phone: '143-097-7124x909',
       address: '436 Christopher Forge Apt. 599\nNew Taylortown, WV 90754',
       password: '2i^8Moj#k8_p',
+      image: 'https://randomuser.me/api/portraits/men/5.jpg',
     },
     {
       name: 'Benjamin Smith',
@@ -83,13 +46,7 @@ const data = {
       phone: '+1-638-871-0242x693',
       address: '6846 Kathryn Run Suite 481\nFigueroabury, OH 02808',
       password: ')89Y!3Gc+A12',
-    },
-    {
-      name: 'Wendy Torres',
-      email: 'ryanangela@gmail.com',
-      phone: '(080)638-3584x521',
-      address: '126 Jones Mall Suite 953\nPort Jose, NM 44600',
-      password: 'Uk2)(2Z&zm3X',
+      image: 'https://randomuser.me/api/portraits/men/6.jpg',
     },
     {
       name: 'Jeffrey Thompson',
@@ -97,6 +54,7 @@ const data = {
       phone: '(231)014-3294x53750',
       address: 'Unit 3795 Box 5853\nDPO AA 02809',
       password: 'e&H9Bw#jUl%1',
+      image: 'https://randomuser.me/api/portraits/men/7.jpg',
     },
     {
       name: 'Kenneth Lopez',
@@ -104,6 +62,7 @@ const data = {
       phone: '(599)581-2795x530',
       address: '334 Kelly Throughway\nLloydhaven, HI 12526',
       password: '!cmD*vTij6mB',
+      image: 'https://randomuser.me/api/portraits/men/8.jpg',
     },
     {
       name: 'Tyler Morgan',
@@ -111,6 +70,7 @@ const data = {
       phone: '(685)690-7949',
       address: '1724 Acevedo Way Apt. 850\nEast Lawrence, ND 31199',
       password: 'r&I5MUCn%!7*',
+      image: 'https://randomuser.me/api/portraits/men/9.jpg',
     },
     {
       name: 'Scott Davenport',
@@ -118,41 +78,7 @@ const data = {
       phone: '108-449-6222x570',
       address: '9522 Mann Islands\nWest Heather, DE 38726',
       password: 'fmdQYmq2^B52',
-    },
-    {
-      name: 'Jacqueline Thomas',
-      email: 'richardsnyder@hotmail.com',
-      phone: '234.450.0248',
-      address: 'Unit 7929 Box 3340\nDPO AP 69569',
-      password: 'T+rKS)Lb$2!#',
-    },
-    {
-      name: 'Melanie Harrison',
-      email: 'douglasjohnson@green-montgomery.com',
-      phone: '(095)672-5996x6662',
-      address: '343 Sullivan Burgs Apt. 514\nHumphreyfurt, MD 87228',
-      password: 'tbHx7GjU@8wL',
-    },
-    {
-      name: 'Dr. Joseph Hall',
-      email: 'ramirezbenjamin@ross.com',
-      phone: '038-931-1290x70824',
-      address: '18219 Cameron Valleys\nFergusonville, VA 04364',
-      password: 'Z#Mz@1AwqBa3',
-    },
-    {
-      name: 'Melissa Malone',
-      email: 'scott35@yahoo.com',
-      phone: '001-793-981-8893x74127',
-      address: '7790 Norton Green\nLake Jonathan, FL 80741',
-      password: '%ub9#LK1k8)l',
-    },
-    {
-      name: 'Dawn Martinez',
-      email: 'ericasmith@yahoo.com',
-      phone: '448-138-2661x37021',
-      address: '0019 Matthews Manors\nEmilyside, FL 40532',
-      password: '_1%bqC&N2DI9',
+      image: 'https://randomuser.me/api/portraits/men/10.jpg',
     },
     {
       name: 'David Jackson',
@@ -160,13 +86,7 @@ const data = {
       phone: '(544)961-1506',
       address: '565 Vazquez Isle\nNorth Kyleshire, NH 21949',
       password: '+4!FlBTacjij',
-    },
-    {
-      name: 'Ahnaf Tahmid',
-      email: 'ahnaftahmid802@gmail.com',
-      phone: '+821414447',
-      address: 'Mountain View , CA , USA',
-      password: 'were5645%^',
+      image: 'https://randomuser.me/api/portraits/men/11.jpg',
     },
   ],
 };

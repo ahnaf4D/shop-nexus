@@ -6,9 +6,15 @@ import {
   processRegister,
   activateUser,
   updateUserById,
+  banUserById,
+  unBanUserById,
+  updateUserPassword,
 } from '../controllers/userController.js';
 import { handleMulterError, upload } from '../middlewares/uploadFiles.js';
-import { validateUserRegistration } from '../validators/auth.js';
+import {
+  validateUserPasswordUpdate,
+  validateUserRegistration,
+} from '../validators/auth.js';
 import { runValidation } from '../validators/index.js';
 import { isAdmin, isLoggedIn, isLoggedOut } from '../middlewares/auth.js';
 
@@ -35,5 +41,13 @@ userRouter.put(
   isLoggedIn,
   updateUserById
 );
-
+userRouter.put('/ban-user/:id', isLoggedIn, isAdmin, banUserById);
+userRouter.put('/unban-user/:id', isLoggedIn, isAdmin, unBanUserById);
+userRouter.put(
+  '/update-password/:id',
+  validateUserPasswordUpdate,
+  runValidation,
+  isLoggedIn,
+  updateUserPassword
+);
 export { userRouter };

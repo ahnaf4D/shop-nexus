@@ -1,5 +1,4 @@
 import createHttpError from 'http-errors';
-import jwt from 'jsonwebtoken';
 import { JwtAccessKey } from '../secret.js';
 import { verifyJsonWebToken } from '../helper/jsonwebtoken.js';
 const isLoggedIn = async (req, res, next) => {
@@ -12,7 +11,7 @@ const isLoggedIn = async (req, res, next) => {
     if (!decoded) {
       throw createHttpError(401, 'Invalid Access Token');
     }
-    req.user = decoded.user;
+    req.user = decoded.userWithoutPass;
     next();
   } catch (error) {
     next(error);
@@ -32,20 +31,11 @@ const isLoggedOut = async (req, res, next) => {
     next(error);
   }
 };
-const isAdmin = async (req, res, next) => {
-  try {
-    console.log('from admin : ', req.user.isAdmin);
-    // if user isAdmin status `false` user see the error below
-    if (req.user.isAdmin === false) {
-      console.log(req.user.isAdmin);
-      throw createHttpError(
-        403,
-        'Forbidden. You must be an admin to access these resource'
-      );
-    }
+const isAdmin = (req, res, next) => {
+  if (req.user && req.user.isAdmin) {
     next();
-  } catch (error) {
-    next();
+  } else {
+    res.status(401).json({ message: 'Not authorized as an admin' });
   }
 };
 

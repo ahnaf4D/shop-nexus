@@ -3,7 +3,10 @@ import bcrypt from 'bcryptjs';
 import { User } from '../models/userModel.js';
 import { deleteImage, updateUserImage } from '../helper/cloudinary.js';
 import mongoose from 'mongoose';
-import { createJsonWebToken } from '../helper/jsonwebtoken.js';
+import {
+  createJsonWebToken,
+  verifyJsonWebToken,
+} from '../helper/jsonwebtoken.js';
 import { sendEmailWithNodeMailer } from '../helper/email.js';
 import { clientUrl, JwtForgetPassKey } from '../secret.js';
 const findUsers = async (search, limit, page) => {
@@ -192,7 +195,31 @@ const forgetPasswordByEmail = async (email) => {
     throw error;
   }
 };
-
+const resetUserPassword = async (token, password) => {
+  try {
+    const decoded = verifyJsonWebToken(token, JwtForgetPassKey);
+    if (!decoded) {
+      throw createHttpError(400, 'Invalid or expired token');
+    }
+    const filter = { email: decoded.email };
+    const update = { password: password };
+    const options = { new: true };
+    const updatedUser = await User.findOneAndUpdate(
+      filter,
+      update,
+      options
+    ).select('-password');
+    if (!updatedUser) {
+      throw createHttpError(400, 'Password reset failed');
+    }
+    return updatedUser;
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      throw createHttpError(400, 'Invalid user ID');
+    }
+    throw error;
+  }
+};
 export {
   findUsers,
   findUserById,
@@ -200,4 +227,5 @@ export {
   updateUserWithId,
   updateUserPasswordById,
   forgetPasswordByEmail,
+  resetUserPassword,
 };

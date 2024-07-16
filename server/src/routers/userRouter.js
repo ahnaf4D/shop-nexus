@@ -10,12 +10,14 @@ import {
   unBanUserById,
   updateUserPassword,
   forgetUserPassword,
+  userResetPassword,
 } from '../controllers/userController.js';
 import { handleMulterError, upload } from '../middlewares/uploadFiles.js';
 import {
   validateUserForgetPassword,
   validateUserPasswordUpdate,
   validateUserRegistration,
+  validateUserResetPassWord,
 } from '../validators/auth.js';
 import { runValidation } from '../validators/index.js';
 import { isAdmin, isLoggedIn, isLoggedOut } from '../middlewares/auth.js';
@@ -37,6 +39,15 @@ userRouter.get('/', isLoggedIn, isAdmin, getUsers);
 userRouter.get('/:id', isLoggedIn, getUserById);
 userRouter.delete('/:id', isLoggedIn, isAdmin, deleteUserById);
 userRouter.put(
+  '/reset-password',
+  validateUserResetPassWord,
+  runValidation,
+  (req, res) => {
+    console.log(req.body); // Check the body content
+    userResetPassword(req, res);
+  }
+);
+userRouter.put(
   '/:id',
   upload.single('image'),
   handleMulterError,
@@ -53,9 +64,16 @@ userRouter.put(
   updateUserPassword
 );
 userRouter.post(
-  '/forget-password/:id',
+  '/forget-password',
   validateUserForgetPassword,
   runValidation,
   forgetUserPassword
 );
+// userRouter.put(
+//   '/reset-password',
+//   validateUserResetPassWord,
+//   runValidation,
+//   userResetPassword
+// );
+
 export { userRouter };

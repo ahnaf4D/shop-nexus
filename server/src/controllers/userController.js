@@ -18,6 +18,7 @@ import {
   findUserById,
   findUsers,
   forgetPasswordByEmail,
+  resetUserPassword,
   updateUserPasswordById,
   updateUserWithId,
 } from '../services/userService.js';
@@ -99,9 +100,21 @@ const processRegister = async (req, res, next) => {
       email,
       subject: 'Account Activation Email',
       html: `
-        <h2>Hello ${name}!</h2>
-        <p>Please click here to <a href="${clientUrl}/api/users/activate/${token}" target="_blank">activate your account</a></p>
-      `,
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2 style="color: #444;">Hello ${name},</h2>
+        <p>Thank you for registering with Nexus-Shop! To complete your registration, please click the link below to activate your account:</p>
+        <p style="text-align: center;">
+          <a href="${clientUrl}/api/users/activate/${token}" target="_blank" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Activate Your Account</a>
+        </p>
+        <p>If you did not register for an account, please disregard this email.</p>
+        <p>Best regards,</p>
+        <p>The Nexus-Shop Team</p>
+        <hr style="border: 0; border-top: 1px solid #ccc;" />
+        <p style="font-size: 0.9em; color: #777;">
+          If you have any questions, feel free to contact our support team at <a href="mailto:support@nexus-shop.com">support@nexus-shop.com</a>.
+        </p>
+      </div>
+    `,
     };
 
     try {
@@ -271,6 +284,19 @@ const forgetUserPassword = async (req, res, next) => {
     next(error);
   }
 };
+const userResetPassword = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+    const updatedUser = await resetUserPassword(token, password);
+    return successResponse(res, {
+      statusCode: 200,
+      message: 'user password reset successfully',
+      payload: { updatedUser },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export {
   getUsers,
   getUserById,
@@ -282,4 +308,5 @@ export {
   unBanUserById,
   updateUserPassword,
   forgetUserPassword,
+  userResetPassword,
 };

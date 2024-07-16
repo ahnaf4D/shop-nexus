@@ -99,10 +99,24 @@ const validateUserForgetPassword = [
     .isEmail()
     .withMessage('Invalid email address'),
 ];
+const validateUserResetPassWord = [
+  body('token').trim().notEmpty().withMessage('Token is required.'),
+  body('password')
+    .trim()
+    .notEmpty()
+    .withMessage('New password is required. Enter Your New password')
+    .isLength({ min: 6 })
+    .withMessage('New Password Should be at 6 character long')
+    .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^\da-zA-Z]).{6,}$/)
+    .withMessage(
+      'The password must include both uppercase and lowercase letters, at least one digit, and at least one special symbol.'
+    ),
+];
 // sign in validation
 export {
   validateUserRegistration,
   validateUserLogin,
   validateUserPasswordUpdate,
   validateUserForgetPassword,
+  validateUserResetPassWord,
 };

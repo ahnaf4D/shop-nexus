@@ -7,7 +7,7 @@ import {
   createJsonWebToken,
   verifyJsonWebToken,
 } from '../helper/jsonwebtoken.js';
-import { clientUrl, JwtActivationKey } from '../secret.js';
+import { clientUrl, JwtActivationKey, JwtForgetPassKey } from '../secret.js';
 import { sendEmailWithNodeMailer } from '../helper/email.js';
 import { CLOUDINARY_CONFIG } from '../config/config.js';
 import { addImageBuffer, getImageBuffer } from '../helper/storeBuffer.js';
@@ -17,6 +17,7 @@ import {
   deleteUserWithId,
   findUserById,
   findUsers,
+  forgetPasswordByEmail,
   updateUserPasswordById,
   updateUserWithId,
 } from '../services/userService.js';
@@ -257,6 +258,19 @@ const updateUserPassword = async (req, res, next) => {
     next(error);
   }
 };
+const forgetUserPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const token = await forgetPasswordByEmail(email);
+    return successResponse(res, {
+      statusCode: 200,
+      message: 'forget user password request successfully',
+      payload: token,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export {
   getUsers,
   getUserById,
@@ -267,4 +281,5 @@ export {
   banUserById,
   unBanUserById,
   updateUserPassword,
+  forgetUserPassword,
 };

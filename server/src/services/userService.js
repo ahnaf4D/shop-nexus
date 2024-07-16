@@ -3,6 +3,9 @@ import bcrypt from 'bcryptjs';
 import { User } from '../models/userModel.js';
 import { deleteImage, updateUserImage } from '../helper/cloudinary.js';
 import mongoose from 'mongoose';
+import { createJsonWebToken } from '../helper/jsonwebtoken.js';
+import { sendEmailWithNodeMailer } from '../helper/email.js';
+import { clientUrl, JwtForgetPassKey } from '../secret.js';
 const findUsers = async (search, limit, page) => {
   try {
     const searchRegExp = new RegExp('.*' + search + '.*', 'i');
@@ -158,10 +161,43 @@ const updateUserPasswordById = async (
     throw error;
   }
 };
+const forgetPasswordByEmail = async (email) => {
+  try {
+    const userData = await User.findOne({ email });
+    if (!userData) {
+      throw createHttpError(
+        404,
+        'Email is incorrect or you have not verified. Please Register First'
+      );
+    }
+
+    const token = createJsonWebToken('10m', JwtForgetPassKey, { email });
+    const emailData = {
+      email,
+      subject: 'Password Reset Request',
+      html: `
+        <h2>Hello,</h2>
+        <p>We received a request to reset your password. If you made this request, please <a href="${clientUrl}/api/users/reset-password/${token}">click here</a> to reset your password. If you did not make this request, you can safely ignore this email.</p>
+        <p>Thank you,</p>
+        <p>Nexus-Shop</p>
+      `,
+    };
+
+    await sendEmailWithNodeMailer(emailData);
+    return token;
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      throw createHttpError(400, 'Invalid user ID');
+    }
+    throw error;
+  }
+};
+
 export {
   findUsers,
   findUserById,
   deleteUserWithId,
   updateUserWithId,
   updateUserPasswordById,
+  forgetPasswordByEmail,
 };

@@ -9,9 +9,11 @@ import {
   banUserById,
   unBanUserById,
   updateUserPassword,
+  forgetUserPassword,
 } from '../controllers/userController.js';
 import { handleMulterError, upload } from '../middlewares/uploadFiles.js';
 import {
+  validateUserForgetPassword,
   validateUserPasswordUpdate,
   validateUserRegistration,
 } from '../validators/auth.js';
@@ -49,5 +51,11 @@ userRouter.put(
   runValidation,
   isLoggedIn,
   updateUserPassword
+);
+userRouter.post(
+  '/forget-password/:id',
+  validateUserForgetPassword,
+  runValidation,
+  forgetUserPassword
 );
 export { userRouter };

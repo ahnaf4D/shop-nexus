@@ -91,9 +91,18 @@ const validateUserPasswordUpdate = [
     return true;
   }),
 ];
+const validateUserForgetPassword = [
+  body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Invalid email address'),
+];
 // sign in validation
 export {
   validateUserRegistration,
   validateUserLogin,
   validateUserPasswordUpdate,
+  validateUserForgetPassword,
 };

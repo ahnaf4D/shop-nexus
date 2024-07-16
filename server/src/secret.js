@@ -10,6 +10,9 @@ const JwtActivationKey =
 const JwtAccessKey =
   process.env.JWT_ACCESS_KEY ||
   '1876458c39eb46113159259d61a15e14a6381c525eaecc70951a06e8494d4f7e08232d3fcd57a7742c797edbc50b81e669c0b8e251731bff3556e29c4cb8a007';
+const JwtForgetPassKey =
+  process.env.JWT_FORGET_PASS_KEY ||
+  '3e245eec0bf023f1b79296845a3b3edec52ce61f69042e60557f2dd69a07a355d7ad736c33ce87254038e2579c1ac16d4e1647cc733da0c54b78ef29d0291fe8';
 const SmtpUserName = process.env.SMTP_USERNAME || '';
 const SmtpUserPass = process.env.SMTP_PASSWORD || '';
 const clientUrl = process.env.CLIENT_URL;
@@ -23,4 +26,5 @@ export {
   SmtpUserName,
   SmtpUserPass,
   clientUrl,
+  JwtForgetPassKey,
 };

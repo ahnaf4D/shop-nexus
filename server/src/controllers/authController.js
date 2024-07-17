@@ -2,8 +2,11 @@ import createHttpError from 'http-errors';
 import { User } from '../models/userModel.js';
 import { successResponse } from './responseController.js';
 import bcrypt from 'bcryptjs';
-import { createJsonWebToken } from '../helper/jsonwebtoken.js';
-import { JwtAccessKey } from '../secret.js';
+import {
+  createJsonWebToken,
+  verifyJsonWebToken,
+} from '../helper/jsonwebtoken.js';
+import { JwtAccessKey, JwtRefreshKey } from '../secret.js';
 
 const userLogin = async (req, res, next) => {
   try {
@@ -22,21 +25,25 @@ const userLogin = async (req, res, next) => {
       );
     }
 
+    // Compare provided password with stored password
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
       throw createHttpError(401, 'Email or password did not match');
     }
 
+    // Check if user is banned
     if (user.isBanned) {
       throw createHttpError(
         401,
         'You are banned. Please contact the authority'
       );
     }
+    // Remove password from user object before creating tokens
     const userWithoutPass = await User.findOne({ email }).select('-password');
+
     // Create access token
     const accessToken = createJsonWebToken('10m', JwtAccessKey, {
-      userWithoutPass,
+      user: userWithoutPass,
     });
 
     // Set access token as a cookie
@@ -46,22 +53,36 @@ const userLogin = async (req, res, next) => {
       secure: true,
       sameSite: 'none',
     });
+    const refreshToken = createJsonWebToken('10d', JwtRefreshKey, {
+      user: userWithoutPass,
+    });
+
+    // Set refresh token as a cookie
+    res.cookie('refreshToken', refreshToken, {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
 
     return successResponse(res, {
       statusCode: 200,
       message: 'User logged in successfully',
-      payload: { userWithoutPass },
+      payload: { user: userWithoutPass },
     });
   } catch (error) {
     next(error);
   }
 };
+
 const userLogOut = async (req, res, next) => {
   try {
+    // Clear cookies on logout
     res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
     return successResponse(res, {
       statusCode: 200,
-      message: 'User Logged out successfully',
+      message: 'User logged out successfully',
       payload: {},
     });
   } catch (error) {
@@ -69,4 +90,49 @@ const userLogOut = async (req, res, next) => {
   }
 };
 
-export { userLogin, userLogOut };
+const generateRefreshToken = async (req, res, next) => {
+  try {
+    const oldRefreshToken = req.cookies.refreshToken;
+    // verify old refresh token
+    const decoded = verifyJsonWebToken(oldRefreshToken, JwtRefreshKey);
+    if (!decoded) {
+      throw createHttpError(401, 'Invalid refresh token please login again');
+    }
+    // Create access token
+    const accessToken = createJsonWebToken('10m', JwtAccessKey, {
+      user: decoded.user,
+    });
+
+    // Set access token as a cookie
+    res.cookie('accessToken', accessToken, {
+      maxAge: 10 * 60 * 1000, // 10 minutes
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+    return successResponse(res, {
+      statusCode: 200,
+      message: 'New access token is generated',
+      payload: { accessToken },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const handleProtectedRoute = async (req, res, next) => {
+  try {
+    const accessToken = req.cookies.accessToken;
+    const decodedToken = verifyJsonWebToken(accessToken, JwtAccessKey);
+    if (!decodedToken) {
+      throw createHttpError(401, 'Invalid access token please login again');
+    }
+    return successResponse(res, {
+      statusCode: 200,
+      message: 'Protected resources access successfully',
+      payload: {},
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export { userLogin, userLogOut, generateRefreshToken, handleProtectedRoute };

@@ -112,6 +112,9 @@ const validateUserResetPassWord = [
       'The password must include both uppercase and lowercase letters, at least one digit, and at least one special symbol.'
     ),
 ];
+// const validateRefreshToken = [
+//   body('token').trim().notEmpty().withMessage('Token is missing'),
+// ];
 // sign in validation
 export {
   validateUserRegistration,
@@ -119,4 +122,5 @@ export {
   validateUserPasswordUpdate,
   validateUserForgetPassword,
   validateUserResetPassWord,
+  // validateRefreshToken,s
 };

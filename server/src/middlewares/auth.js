@@ -8,10 +8,11 @@ const isLoggedIn = async (req, res, next) => {
       throw createHttpError(401, 'Access Token Not Found');
     }
     const decoded = verifyJsonWebToken(accessToken, JwtAccessKey);
+    console.log('Decoded Token:', decoded); // Log the decoded token
     if (!decoded) {
       throw createHttpError(401, 'Invalid Access Token');
     }
-    req.user = decoded.userWithoutPass;
+    req.user = decoded.user;
     next();
   } catch (error) {
     next(error);
